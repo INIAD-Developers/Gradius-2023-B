@@ -52,22 +52,22 @@ export const playersRepository = {
       });
     return toPlayerModel(prismaPlayer);
   },
-  findAll: async (): Promise<{ body: PlayerModel[]; change: boolean }> => {
+  findAll: async (): Promise<{ body: PlayerModel[]; hasChange: boolean }> => {
     const status = statuses[change];
     change = change === 1 ? 2 : 0;
     const prismaPlayers = await prismaClient.player.findMany({
       orderBy: { createdAt: 'desc' },
     });
-    return { body: prismaPlayers.map(toPlayerModel), change: status };
+    return { body: prismaPlayers.map(toPlayerModel), hasChange: status };
   },
-  findAllInTeam: async (team: string): Promise<{ body: PlayerModel[]; change: boolean }> => {
+  findAllInTeam: async (team: string): Promise<{ body: PlayerModel[]; hasChange: boolean }> => {
     const status = statuses[change];
     change = change === 1 ? 2 : 0;
     const prismaPlayers = await prismaClient.player.findMany({
       where: { team },
       orderBy: { createdAt: 'desc' },
     });
-    return { body: prismaPlayers.map(toPlayerModel), change: status };
+    return { body: prismaPlayers.map(toPlayerModel), hasChange: status };
   },
   find: async (id: UserId): Promise<PlayerModel | null> => {
     change = change === 1 ? 2 : 0;

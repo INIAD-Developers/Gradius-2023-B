@@ -48,21 +48,21 @@ const Game = () => {
     const [shipImage] = useImage(staticPath.images.spaceship_png);
     const [enemyImage] = useImage(staticPath.images.enemy_spaceship_png);
     const fetchPlayers = async (display: number) => {
-      const { body: res, change: change } = await apiClient.player.$get({ query: { display } });
+      const { body: res, hasChange: change } = await apiClient.player.$get({ query: { display } });
       if (res !== null && change === true) {
         setPlayers(res);
       }
     };
 
     const fetchEnemies = async (display: number) => {
-      const { body: res, change: change } = await apiClient.enemy.$get({ query: { display } });
+      const { body: res, hasChange: change } = await apiClient.enemy.$get({ query: { display } });
       if (res !== null && change === true) {
         setEnemies(res);
       }
     };
 
     const fetchBullets = async (display: number) => {
-      const { body: res, change: change } = await apiClient.bullet.$get({ query: { display } });
+      const { body: res, hasChange: change } = await apiClient.bullet.$get({ query: { display } });
       if (res !== null && change === true) {
         setBullets(res);
       }

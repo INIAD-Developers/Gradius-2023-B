@@ -37,19 +37,19 @@ export const enemiesRepository = {
       });
     return toEnemyModel(prismaEnemy);
   },
-  findAll: async (): Promise<{ body: EnemyModel[]; change: boolean }> => {
+  findAll: async (): Promise<{ body: EnemyModel[]; hasChange: boolean }> => {
     const status = statuses[change];
     change = change === 1 ? 2 : 0;
     const prismaEnemies = await prismaClient.enemy.findMany({
       orderBy: { createdAt: 'desc' },
     });
-    return { body: prismaEnemies.map(toEnemyModel), change: status };
+    return { body: prismaEnemies.map(toEnemyModel), hasChange: status };
   },
-  find: async (id: string): Promise<{ body: EnemyModel; change: boolean } | null> => {
+  find: async (id: string): Promise<{ body: EnemyModel; hasChange: boolean } | null> => {
     const status = statuses[change];
     change = change === 1 ? 2 : 0;
     const prismaEnemy = await prismaClient.enemy.findUnique({ where: { id } });
-    return prismaEnemy !== null ? { body: toEnemyModel(prismaEnemy), change: status } : null;
+    return prismaEnemy !== null ? { body: toEnemyModel(prismaEnemy), hasChange: status } : null;
   },
   delete: async (id: string): Promise<void> => {
     await prismaClient.enemy.delete({ where: { id } }).then(() => (change = 1));

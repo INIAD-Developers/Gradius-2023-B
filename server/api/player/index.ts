@@ -6,7 +6,7 @@ export type Methods = {
     query: {
       display: number;
     };
-    resBody: { body: PlayerModel[]; change: boolean };
+    resBody: { body: PlayerModel[]; hasChange: boolean };
   };
   post: {
     reqBody: {

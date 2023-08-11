@@ -23,19 +23,19 @@ let change = 2;
 const statuses = [false, false, true];
 
 export const bulletsRepository = {
-  findAll: async (): Promise<{ body: BulletModel[]; change: boolean }> => {
+  findAll: async (): Promise<{ body: BulletModel[]; hasChange: boolean }> => {
     const status = statuses[change];
     change = change === 1 ? 2 : 0;
     const prismaBullets = await prismaClient.bullet.findMany({
       orderBy: { createdAt: 'desc' },
     });
-    return { body: prismaBullets.map(toBulletModel), change: status };
+    return { body: prismaBullets.map(toBulletModel), hasChange: status };
   },
-  find: async (id: string): Promise<{ body: BulletModel; change: boolean } | null> => {
+  find: async (id: string): Promise<{ body: BulletModel; hasChange: boolean } | null> => {
     const status = statuses[change];
     change = change === 1 ? 2 : 0;
     const prismaBullet = await prismaClient.bullet.findUnique({ where: { id } });
-    return prismaBullet !== null ? { body: toBulletModel(prismaBullet), change: status } : null;
+    return prismaBullet !== null ? { body: toBulletModel(prismaBullet), hasChange: status } : null;
   },
   delete: async (id: string): Promise<void> => {
     try {
