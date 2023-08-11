@@ -51,21 +51,21 @@ const Game = () => {
       const { body: res, hasChange: hasChange } = await apiClient.player.$get({
         query: { display },
       });
-      if (res !== null && hasChange === true) {
+      if (res !== null && hasChange) {
         setPlayers(res);
       }
     };
 
     const fetchEnemies = async (display: number) => {
       const { body: res, hasChange } = await apiClient.enemy.$get({ query: { display } });
-      if (res !== null && hasChange === true) {
+      if (res !== null && hasChange) {
         setEnemies(res);
       }
     };
 
     const fetchBullets = async (display: number) => {
       const { body: res, hasChange } = await apiClient.bullet.$get({ query: { display } });
-      if (res !== null && hasChange === true) {
+      if (res !== null && hasChange) {
         setBullets(res);
       }
     };
