@@ -18,29 +18,30 @@ const toBulletModel = (prismaBullet: Bullet): BulletModel => ({
   createdAt: prismaBullet.createdAt.getTime(),
 });
 
-let change = 2;
+let change = true;
 
-const statuses = [false, false, true];
+type Find = { body: BulletModel; hasChange: boolean };
 
+type FindAll = { body: BulletModel[]; hasChange: boolean };
 export const bulletsRepository = {
-  findAll: async (): Promise<{ body: BulletModel[]; hasChange: boolean }> => {
-    const status = statuses[change];
-    change = change === 1 ? 2 : 0;
+  findAll: async (): Promise<FindAll> => {
+    const hasChange = change;
+    change = !change;
     const prismaBullets = await prismaClient.bullet.findMany({
       orderBy: { createdAt: 'desc' },
     });
-    return { body: prismaBullets.map(toBulletModel), hasChange: status };
+    return { body: prismaBullets.map(toBulletModel), hasChange };
   },
-  find: async (id: string): Promise<{ body: BulletModel; hasChange: boolean } | null> => {
-    const status = statuses[change];
-    change = change === 1 ? 2 : 0;
+  find: async (id: string): Promise<Find | null> => {
+    const hasChange = change;
+    change = !change;
     const prismaBullet = await prismaClient.bullet.findUnique({ where: { id } });
-    return prismaBullet !== null ? { body: toBulletModel(prismaBullet), hasChange: status } : null;
+    if (prismaBullet === null) return null;
+    return { body: toBulletModel(prismaBullet), hasChange };
   },
   delete: async (id: string): Promise<void> => {
     try {
-      await prismaClient.bullet.delete({ where: { id } }).then(() => (change = 1));
-      console.log('success delete');
+      await prismaClient.bullet.delete({ where: { id } }).then(() => (change = true));
     } catch (error) {
       console.log(error);
     }
@@ -57,6 +58,6 @@ export const bulletsRepository = {
           createdAt: new Date(bullet.createdAt),
         },
       })
-      .then(() => (change = 1));
+      .then(() => (change = true));
   },
 };
