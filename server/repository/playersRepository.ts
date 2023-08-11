@@ -20,9 +20,9 @@ const toPlayerModel = (prismaPlayer: Player): PlayerModel => ({
   createdAt: prismaPlayer.createdAt.getTime(),
 });
 
-let change = 2;
+let change = true;
 
-const statuses = [false, false, true];
+type FindAll = { body: PlayerModel[]; hasChange: boolean };
 
 export const playersRepository = {
   save: async (player: PlayerModel): Promise<PlayerModel> => {
@@ -47,34 +47,34 @@ export const playersRepository = {
         },
       })
       .then((player) => {
-        change = 1;
+        change = true;
         return player;
       });
     return toPlayerModel(prismaPlayer);
   },
-  findAll: async (): Promise<{ body: PlayerModel[]; hasChange: boolean }> => {
-    const status = statuses[change];
-    change = change === 1 ? 2 : 0;
+  findAll: async (): Promise<FindAll> => {
+    const hasChange = change;
+    change = false;
     const prismaPlayers = await prismaClient.player.findMany({
       orderBy: { createdAt: 'desc' },
     });
-    return { body: prismaPlayers.map(toPlayerModel), hasChange: status };
+    return { body: prismaPlayers.map(toPlayerModel), hasChange };
   },
-  findAllInTeam: async (team: string): Promise<{ body: PlayerModel[]; hasChange: boolean }> => {
-    const status = statuses[change];
-    change = change === 1 ? 2 : 0;
+  findAllInTeam: async (team: string): Promise<FindAll> => {
+    const hasChange = change;
+    change = false;
     const prismaPlayers = await prismaClient.player.findMany({
       where: { team },
       orderBy: { createdAt: 'desc' },
     });
-    return { body: prismaPlayers.map(toPlayerModel), hasChange: status };
+    return { body: prismaPlayers.map(toPlayerModel), hasChange };
   },
   find: async (id: UserId): Promise<PlayerModel | null> => {
-    change = change === 1 ? 2 : 0;
+    change = false;
     const prismaPlayer = await prismaClient.player.findUnique({ where: { id } });
     return prismaPlayer !== null ? toPlayerModel(prismaPlayer) : null;
   },
   delete: async (id: string): Promise<void> => {
-    await prismaClient.player.delete({ where: { id } }).then(() => (change = 1));
+    await prismaClient.player.delete({ where: { id } }).then(() => (change = true));
   },
 };

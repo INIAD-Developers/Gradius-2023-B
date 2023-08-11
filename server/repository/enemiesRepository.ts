@@ -16,9 +16,11 @@ const toEnemyModel = (prismaEnemy: Enemy): EnemyModel => ({
   createdAt: prismaEnemy.createdAt.getTime(),
 });
 
-let change = 2;
+let change = true;
 
-const statuses = [false, false, true];
+type Find = { body: EnemyModel; hasChange: boolean };
+
+type FindAll = { body: EnemyModel[]; hasChange: boolean };
 
 export const enemiesRepository = {
   create: async (enemy: EnemyModel): Promise<EnemyModel> => {
@@ -32,26 +34,26 @@ export const enemiesRepository = {
         },
       })
       .then((enemy) => {
-        change = 1;
+        change = true;
         return enemy;
       });
     return toEnemyModel(prismaEnemy);
   },
-  findAll: async (): Promise<{ body: EnemyModel[]; hasChange: boolean }> => {
-    const status = statuses[change];
-    change = change === 1 ? 2 : 0;
+  findAll: async (): Promise<FindAll> => {
+    const hasChange = change;
+    change = false;
     const prismaEnemies = await prismaClient.enemy.findMany({
       orderBy: { createdAt: 'desc' },
     });
-    return { body: prismaEnemies.map(toEnemyModel), hasChange: status };
+    return { body: prismaEnemies.map(toEnemyModel), hasChange };
   },
-  find: async (id: string): Promise<{ body: EnemyModel; hasChange: boolean } | null> => {
-    const status = statuses[change];
-    change = change === 1 ? 2 : 0;
+  find: async (id: string): Promise<Find | null> => {
+    const hasChange = change;
+    change = false;
     const prismaEnemy = await prismaClient.enemy.findUnique({ where: { id } });
-    return prismaEnemy !== null ? { body: toEnemyModel(prismaEnemy), hasChange: status } : null;
+    return prismaEnemy !== null ? { body: toEnemyModel(prismaEnemy), hasChange } : null;
   },
   delete: async (id: string): Promise<void> => {
-    await prismaClient.enemy.delete({ where: { id } }).then(() => (change = 1));
+    await prismaClient.enemy.delete({ where: { id } }).then(() => (change = true));
   },
 };
