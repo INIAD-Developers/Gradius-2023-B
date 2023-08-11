@@ -26,7 +26,7 @@ type FindAll = { body: BulletModel[]; hasChange: boolean };
 export const bulletsRepository = {
   findAll: async (): Promise<FindAll> => {
     const hasChange = change;
-    change = !change;
+    change = false;
     const prismaBullets = await prismaClient.bullet.findMany({
       orderBy: { createdAt: 'desc' },
     });
@@ -34,7 +34,7 @@ export const bulletsRepository = {
   },
   find: async (id: string): Promise<Find | null> => {
     const hasChange = change;
-    change = !change;
+    change = false;
     const prismaBullet = await prismaClient.bullet.findUnique({ where: { id } });
     if (prismaBullet === null) return null;
     return { body: toBulletModel(prismaBullet), hasChange };
